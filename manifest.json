@@ -1,0 +1,11 @@
+{
+  "$schema": "https://github.com/beat-saber-modding-group/BSIPA-MetadataFileSchema/blob/master/Schema.json",
+  "author": "fck_r_sns",
+  "description": "A mod to track active time spent in the game",
+  "gameVersion": "1.8.0",
+  "id": "BeatSaberTimeTracker",
+  "name": "BeatSaberTimeTracker",
+  "version": "0.0.1-alpha",
+  "dependsOn": {},
+  "features": []
+}
