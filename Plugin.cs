@@ -1,4 +1,5 @@
 ﻿using IPA;
+using UnityEngine;
 using Logger = IPA.Logging.Logger;
 
 namespace BeatSaberTimeTracker
@@ -19,6 +20,10 @@ namespace BeatSaberTimeTracker
         public void OnStart()
         {
             logger.Debug("OnStart");
+
+            GameObject timeTrackerGo = new GameObject("TimeTracker");
+            timeTrackerGo.AddComponent<TimeTracker>();
+            Object.DontDestroyOnLoad(timeTrackerGo);
         }
 
         [OnExit]
