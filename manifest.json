@@ -6,6 +6,8 @@
   "id": "BeatSaberTimeTracker",
   "name": "BeatSaberTimeTracker",
   "version": "0.0.1-alpha",
-  "dependsOn": {},
+  "dependsOn": {
+    "BS Utils": "^1.4.0"
+  },
   "features": []
 }
