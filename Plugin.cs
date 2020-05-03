@@ -1,4 +1,5 @@
-﻿using IPA;
+﻿using BeatSaberTimeTracker.HarmonyPatches;
+using IPA;
 using UnityEngine;
 using Logger = IPA.Logging.Logger;
 
@@ -20,6 +21,8 @@ namespace BeatSaberTimeTracker
         public void OnStart()
         {
             logger.Debug("Plugin.OnStart");
+
+            HarmonyPatcher.ApplyPatches();
 
             GameObject timeTrackerGo = new GameObject("TimeTracker");
             timeTrackerGo.AddComponent<TimeTracker>();

@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -40,6 +39,9 @@ namespace BeatSaberTimeTracker
             SceneManager.sceneLoaded += OnSceneLoaded;
             SceneManager.sceneUnloaded += OnSceneUnloaded;
             SceneManager.activeSceneChanged += OnActiveSceneChanged;
+
+            EventsHelper.onGamePaused += DisableTrackingMode;
+            EventsHelper.onGameResumed += EnableTrackingMode;
         }
 
         private void OnDestroy()
@@ -49,6 +51,9 @@ namespace BeatSaberTimeTracker
             SceneManager.sceneLoaded -= OnSceneLoaded;
             SceneManager.sceneUnloaded -= OnSceneUnloaded;
             SceneManager.activeSceneChanged -= OnActiveSceneChanged;
+
+            EventsHelper.onGamePaused -= DisableTrackingMode;
+            EventsHelper.onGameResumed -= EnableTrackingMode;
         }
 
         private void Update()
@@ -88,27 +93,7 @@ namespace BeatSaberTimeTracker
 
                 case "GameCore":
                     EnableTrackingMode();
-                    StartCoroutine(InitGamePauseCallbacks());
                     break;
-            }
-        }
-
-        IEnumerator InitGamePauseCallbacks()
-        {
-            while (true)
-            {
-                GamePause[] comps = Resources.FindObjectsOfTypeAll<GamePause>();
-                if (comps.Length > 0)
-                {
-                    Plugin.logger.Debug("GamePause has been found");
-                    GamePause gamePause = comps[0];
-                    gamePause.didPauseEvent += DisableTrackingMode;
-                    gamePause.didResumeEvent += EnableTrackingMode;
-                    break;
-                }
-
-                Plugin.logger.Debug("GamePause not found, skip a frame");
-                yield return null;
             }
         }
 
