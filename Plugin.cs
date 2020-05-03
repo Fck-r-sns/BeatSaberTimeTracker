@@ -13,13 +13,13 @@ namespace BeatSaberTimeTracker
         public Plugin(Logger logger)
         {
             Plugin.logger = logger;
-            logger.Debug("Init");
+            logger.Debug("Plugin.Init");
         }
 
         [OnStart]
         public void OnStart()
         {
-            logger.Debug("OnStart");
+            logger.Debug("Plugin.OnStart");
 
             GameObject timeTrackerGo = new GameObject("TimeTracker");
             timeTrackerGo.AddComponent<TimeTracker>();
@@ -29,7 +29,7 @@ namespace BeatSaberTimeTracker
         [OnExit]
         public void OnExit()
         {
-            logger.Debug("OnExit");
+            logger.Debug("Plugin.OnExit");
         }
     }
 }

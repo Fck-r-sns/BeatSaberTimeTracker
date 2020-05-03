@@ -1,7 +1,8 @@
 using System;
-using BS_Utils.Utilities;
+using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace BeatSaberTimeTracker
 {
@@ -36,20 +37,18 @@ namespace BeatSaberTimeTracker
             _totalTimeText = CreateText(_canvas, new Vector2(0f, -0.15f), "");
             _activeTimeText = CreateText(_canvas, new Vector2(0f, -0.3f), "");
 
-            BSEvents.gameSceneActive += EnableTrackingMode;
-            BSEvents.menuSceneActive += DisableTrackingMode;
-            BSEvents.songPaused += DisableTrackingMode;
-            BSEvents.songUnpaused += EnableTrackingMode;
+            SceneManager.sceneLoaded += OnSceneLoaded;
+            SceneManager.sceneUnloaded += OnSceneUnloaded;
+            SceneManager.activeSceneChanged += OnActiveSceneChanged;
         }
 
         private void OnDestroy()
         {
             Plugin.logger.Debug("TimeTracker.OnDestroy()");
 
-            BSEvents.gameSceneActive -= EnableTrackingMode;
-            BSEvents.menuSceneActive -= DisableTrackingMode;
-            BSEvents.songPaused -= DisableTrackingMode;
-            BSEvents.songUnpaused -= EnableTrackingMode;
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            SceneManager.sceneUnloaded -= OnSceneUnloaded;
+            SceneManager.activeSceneChanged -= OnActiveSceneChanged;
         }
 
         private void Update()
@@ -65,6 +64,51 @@ namespace BeatSaberTimeTracker
                 _totalTimeText.text = $"Total: {Mathf.FloorToInt(Time.time / 60f):00}:{Mathf.FloorToInt(Time.time % 60f):00}";
                 _activeTimeText.text = $"Active: {Mathf.FloorToInt(_activeTime / 60f):00}:{Mathf.FloorToInt(_activeTime % 60f):00}";
                 _nextTextUpdate += TEXT_UPDATE_PERIOD;
+            }
+        }
+
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            Plugin.logger.Debug("OnSceneLoaded: " + scene.name + " (" + mode + ")");
+        }
+
+        private void OnSceneUnloaded(Scene scene)
+        {
+            Plugin.logger.Debug("OnSceneUnloaded: " + scene.name);
+        }
+
+        private void OnActiveSceneChanged(Scene previous, Scene current)
+        {
+            Plugin.logger.Debug("OnActiveSceneChanged: " + previous.name + " -> " + current.name);
+            switch (current.name)
+            {
+                case "MenuViewControllers":
+                    DisableTrackingMode();
+                    break;
+
+                case "GameCore":
+                    EnableTrackingMode();
+                    StartCoroutine(InitGamePauseCallbacks());
+                    break;
+            }
+        }
+
+        IEnumerator InitGamePauseCallbacks()
+        {
+            while (true)
+            {
+                GamePause[] comps = Resources.FindObjectsOfTypeAll<GamePause>();
+                if (comps.Length > 0)
+                {
+                    Plugin.logger.Debug("GamePause has been found");
+                    GamePause gamePause = comps[0];
+                    gamePause.didPauseEvent += DisableTrackingMode;
+                    gamePause.didResumeEvent += EnableTrackingMode;
+                    break;
+                }
+
+                Plugin.logger.Debug("GamePause not found, skip a frame");
+                yield return null;
             }
         }
 
